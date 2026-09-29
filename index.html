@@ -384,7 +384,11 @@
           <div>
             <h3 style="font-family:Newsreader,Georgia,serif;font-weight:600;font-size:20px;margin:0 0 2px">Schedule a tour</h3>
             <p style="margin:0 0 14px;font-size:14px;color:#596075">We reply within one business day.</p>
-            <form ref="{{ formRef }}" onSubmit="{{ onSubmit }}" style="display:grid;gap:10px">
+            <form ref="{{ formRef }}" onSubmit="{{ onSubmit }}" action="https://formsubmit.co/Haywardpreschool@gmail.com" method="POST" style="display:grid;gap:10px">
+              <input type="hidden" name="_subject" value="New tour request — Wonderful Montessori" />
+              <input type="hidden" name="_template" value="table" />
+              <input type="hidden" name="_captcha" value="false" />
+              <input type="hidden" name="_next" value="" />
               <label style="display:grid;gap:5px;min-width:0;font-size:12px;font-weight:700;letter-spacing:.04em">Parent name
                 <input name="parent" required="required" placeholder="Your full name" style="border:1.5px solid #D5DBE8;border-radius:12px;padding:9px 12px;font-size:15px;width:100%;min-width:0;font-weight:400;letter-spacing:normal;background:#FAFBFF;color:#1A1F2E;min-height:42px" style-focus="border-color:#2A6FDB;outline:none" />
               </label>
@@ -430,6 +434,17 @@
           </div>
         </sc-if>
       </div>
+    </div>
+
+    <div id="book" style="scroll-margin-top:92px;max-width:1200px;margin:clamp(30px,4vw,48px) auto 0;background:#FFFFFF;border:1px solid #E4E8F2;border-radius:24px;padding:clamp(18px,3vw,30px);display:grid;gap:16px">
+      <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:10px 20px">
+        <div style="display:grid;gap:4px">
+          <span style="font-size:12px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:#2A6FDB">Book instantly</span>
+          <h3 style="font-family:Newsreader,Georgia,serif;font-weight:600;font-size:clamp(22px,2.6vw,28px);margin:0;color:#1A1F2E">Pick a time for a 30-minute tour with Marian</h3>
+        </div>
+        <a href="https://calendly.com/wonderfulmontessoripreschool/30min" target="_blank" rel="noopener" style="font-size:14px;font-weight:700;color:#2A6FDB;text-decoration:none">Open calendar in a new tab ↗</a>
+      </div>
+      <iframe src="https://calendly.com/wonderfulmontessoripreschool/30min?month=2026-09&amp;hide_gdpr_banner=1&amp;primary_color=2a6fdb" title="Schedule a 30-minute tour with Marian" loading="lazy" style="width:100%;height:700px;border:0;border-radius:16px;background:#FAFBFF"></iframe>
     </div>
   </section>
 
@@ -559,6 +574,7 @@ class Component extends DCLogic {
 
   videoRef = React.createRef();
   componentDidMount() {
+    if (/[?&]sent=1/.test(location.search)) this.setState({ submitted: true });
     this.startTimer();
     const v = this.videoRef.current;
     if (v) {
@@ -647,21 +663,7 @@ class Component extends DCLogic {
       submitted: this.state.submitted,
       notSubmitted: !this.state.submitted,
       formRef: this.formRef,
-      onSubmit: async (evt) => {
-        evt.preventDefault();
-        const to = (this.props.formEmail || 'Haywardpreschool@gmail.com').trim();
-        const data = Object.fromEntries(new FormData(evt.currentTarget).entries());
-        if (to) {
-          try {
-            await fetch('https://formsubmit.co/ajax/' + encodeURIComponent(to), {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-              body: JSON.stringify({ _subject: 'New tour request — ' + (data.parent || 'Parent'), _template: 'table', ...data })
-            });
-          } catch (e) {}
-        }
-        this.setState({ submitted: true });
-      },
+      onSubmit: () => { const n = this.formRef.current && this.formRef.current.querySelector('input[name="_next"]'); if (n) n.value = location.href.split('#')[0].split('?')[0] + '?sent=1#visit'; },
       onReset: () => { if (this.formRef.current) this.formRef.current.reset(); this.setState({ submitted: false }); }
     };
   }
